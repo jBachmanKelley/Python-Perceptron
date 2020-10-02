@@ -1,5 +1,0 @@
-    def read_csv(self):
-        with open('GroupA.csv') as file:
-            reader = csv.reader(file)
-            for row in reader:
-                print(row)
