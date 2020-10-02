@@ -56,7 +56,7 @@ class Perceptron:
             totalError = 0
 
             # Access the input data using the randomly ordered, unique values of accessOrder, calc sum and adjust weight
-            for j in range(round(numOfSamples * 3.0 / 4.0)):
+            for j in range(round(numOfSamples * 1.0 / 4.0)):
                 index = accessOrder[j]
                 # The dot product gives the 'net',
                 net = np.dot(self.X[index, :], self.weights)
@@ -121,8 +121,8 @@ class Perceptron:
         #            plt.scatter(self.X[i, 0], self.X[i, 1], c='g') # Big is Green
         # Plot line
         # Plt.Line2D
-        np.savetxt("GroupA_75_Result.csv", self.X, delimiter=',')
-        np.savetxt("GroupA_75_Weights.csv", self.weights, delimiter=',')
+        np.savetxt("GroupA_25_Result.csv", self.X, delimiter=',')
+        np.savetxt("GroupA_25_Weights.csv", self.weights, delimiter=',')
         # plt.show()
 
 
