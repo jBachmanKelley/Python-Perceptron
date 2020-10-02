@@ -17,9 +17,14 @@ class Perceptron:
         self.real_label = self.data[:, [2]]
 
         # Normalize the data and set a learning rate (alpha)
-        self.X = self.data[:, [0, 1]]
-        self.X = self.X / np.linalg.norm(self.X)
-        self.alpha = 0.1
+        self.X0 = self.data[:, [0]]
+        self.X1 = self.data[:, [1]]
+        for x in range(self.X0.shape[0]):
+            # value - min divide by range
+            self.X0[x, 0] = (self.X0[x, 0] - np.min(self.X0)) / (np.max(self.X0) - np.min(self.X0))
+            self.X1[x, 0] = (self.X1[x, 0] - np.min(self.X1)) / (np.max(self.X1) - np.min(self.X1))
+        self.X = np.concatenate([self.X0, self.X1], axis=1)
+        self.alpha = 0.07
 
         # Train the neuron, confirm using real_labels, display
         self.train()
