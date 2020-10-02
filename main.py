@@ -1,5 +1,6 @@
 # John Kelley, 09/29/2020, CMSC 409: Artificial Intelligence, Milos Manic #
 import csv
+import random
 
 import numpy as np
 import pandas as pd
@@ -17,14 +18,14 @@ class Perceptron:
 
         # Normalize the data and set a learning rate (alpha)
         self.X = self.data[:, [0, 1]] / np.linalg.norm(self.data[:, [0, 1]])
-        self.alpha = 0.01
+        self.alpha = 0.1
 
         # Train the neuron, confirm using real_labels, display
         self.train()
         self.display(self.label())
 
     # This method will train the perceptron: Max iterations are 5000, the error threshold should be passed in(NOT DONE YET)
-    def train(self, max_iterations=5000):
+    def train(self, max_iterations=1000):
 
         numOfSamples = self.X.shape[0]
         numOfFeatures = self.X.shape[1]
@@ -37,11 +38,28 @@ class Perceptron:
 
         # NEED TO DO: Implement a way to do a random % of entries
         for i in range(max_iterations):
+            # Initialize T.E to 0
+            totalError = 0
+
+            # Create a random array of row-numbers for access order
+            accessOrder = []
+            for x in range(numOfSamples):
+                temp = 0
+                while temp in accessOrder:
+                    temp = random.randint(0, numOfSamples - 1)
+                accessOrder.append(temp)
+
+            # Access the input data using the randomly ordered, unique values of accessOrder, calc sum and adjust weight
             for j in range(numOfSamples):
+                index = accessOrder[j]
                 # The dot product detects if there is a difference and thus a need to update weights,
-                s = np.dot(self.X[j, :], self.weights)
-                self.weights += self.X[j, :] * self.alpha * (self.real_label[j] - np.sign(s))
-            # This is where we can have a convergence if-statement
+                s = np.dot(self.X[index, :], self.weights)
+                self.weights += self.X[index, :] * self.alpha * (self.real_label[index] - np.sign(s))
+                totalError += (self.real_label[index] - np.sign(s)) * (self.real_label[index] - np.sign(s))
+            # This is where we can have a convergence if-statement which returns
+            if totalError < np.power(10.0, -5):
+                print("Convergence")
+                return
 
         print(self.weights)
 
@@ -51,15 +69,13 @@ class Perceptron:
             print("The data hasn't been trained yet")
             return
 
-        # Isolate input
-        self.X = self.X[:, [0, 1]]
-
         # Activation function
-        y = 1/(1 + np.exp(-1 * self.alpha * (np.dot(self.X[:, [1, 2]], self.weights[1:]) + self.weights[0])))
+        #y = 1/(1 + np.exp(-1 * self.alpha * (np.dot(self.X[:, [1, 2]], self.weights[1:]) + self.weights[0]))) Soft Threshold
+        y = np.sign(np.dot(self.X, self.weights))
 
         # Adjust label vector to 0 or 1
         for i in range(y.shape[0]):
-            if y[i] > 1:
+            if y[i] >= 1:
                 y[i] = 1
             else:
                 y[i] = 0
