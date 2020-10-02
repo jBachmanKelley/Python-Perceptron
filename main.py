@@ -11,9 +11,14 @@ class Perceptron:
     # Class Datafields: None Needed At The Moment
 
     # This method initializes the instance, loads the CSV, and runs the perceptron
-    def __init__(self):
+    def __init__(self, target, percent, epsilon):
+        # Configuration Settings
+        self.target = target
+        self.percentTrain = percent
+        self.epsilon = epsilon
+
         # Import the data and separate it into input and real_labels
-        self.data = self.read_CSV("GroupA.csv")
+        self.data = self.read_CSV(f"{self.target}.csv")
         self.real_label = self.data[:, [2]]
 
         # Normalize the data and set a learning rate (alpha)
@@ -32,7 +37,7 @@ class Perceptron:
         self.display(self.label())
 
     # This method will train the perceptron: Max iterations are 5000, the error threshold should be passed in(NOT DONE YET)
-    def train(self, max_iterations=100):
+    def train(self, max_iterations=5000):
 
         numOfSamples = (self.X.shape[0])
         numOfFeatures = self.X.shape[1]
@@ -56,7 +61,7 @@ class Perceptron:
             totalError = 0
 
             # Access the input data using the randomly ordered, unique values of accessOrder, calc sum and adjust weight
-            for j in range(round(numOfSamples * 1.0 / 4.0)):
+            for j in range(round(numOfSamples * self.percentTrain)):
                 index = accessOrder[j]
                 # The dot product gives the 'net',
                 net = np.dot(self.X[index, :], self.weights)
@@ -71,7 +76,7 @@ class Perceptron:
                 totalError += (self.real_label[index] - out) * (self.real_label[index] - out)
                 # print(f"\nNet is: {net}\nThreshold is: {threshold}\nOut is : {out}\nTotal Error is: {totalError}")
             # This is where we can have a convergence if-statement which returns
-            if totalError < np.power(10.0, -5):
+            if totalError < np.power(10.0, self.epsilon):
                 print("Convergence")
                 return
 
@@ -121,10 +126,15 @@ class Perceptron:
         #            plt.scatter(self.X[i, 0], self.X[i, 1], c='g') # Big is Green
         # Plot line
         # Plt.Line2D
-        np.savetxt("GroupA_25_Result.csv", self.X, delimiter=',')
-        np.savetxt("GroupA_25_Weights.csv", self.weights, delimiter=',')
+        np.savetxt(f"{self.target}_{self.percentTrain}_Result.csv", self.X, delimiter=',')
+        np.savetxt(f"{self.target}_{self.percentTrain}_Weights.csv", self.weights, delimiter=',')
         # plt.show()
 
 
 # Main Script
-perc = Perceptron()
+perc1 = Perceptron("GroupA", 0.75, -5)
+perc2 = Perceptron("GroupA", 0.25, -5)
+perc3 = Perceptron("GroupB", 0.75, 2)
+perc4 = Perceptron("GroupB", 0.25, 2)
+perc5 = Perceptron("GroupC", 0.75, 2)
+perc6 = Perceptron("GroupC", 0.25, 2)
