@@ -24,20 +24,21 @@ class Perceptron:
             self.X0[x, 0] = (self.X0[x, 0] - np.min(self.X0)) / (np.max(self.X0) - np.min(self.X0))
             self.X1[x, 0] = (self.X1[x, 0] - np.min(self.X1)) / (np.max(self.X1) - np.min(self.X1))
         self.X = np.concatenate([self.X0, self.X1], axis=1)
-        self.alpha = 0.07
+
+        self.alpha = 0.01
 
         # Train the neuron, confirm using real_labels, display
         self.train()
         self.display(self.label())
 
     # This method will train the perceptron: Max iterations are 5000, the error threshold should be passed in(NOT DONE YET)
-    def train(self, testPercentage = 0.75, max_iterations=5000):
+    def train(self, testPercentage = 0.75, max_iterations=100):
 
         numOfSamples = self.X.shape[0]
         numOfFeatures = self.X.shape[1]
 
         # Add 1 weight for the offset term
-        self.weights = np.zeros((numOfFeatures + 1))
+        self.weights = np.ones((numOfFeatures + 1))
 
         # Initialize neuron offset between -0.5 and 0.5 for the 2-D array X
         self.X = np.concatenate([self.X, np.random.rand(numOfSamples, 1) - 0.5], axis=1)
@@ -45,7 +46,7 @@ class Perceptron:
         # Create a random array of row-numbers for access order
         accessOrder = []
         for x in range(numOfSamples):
-            temp = 0
+            temp = random.randint(0, numOfSamples - 1)
             while temp in accessOrder:
                 temp = random.randint(0, numOfSamples - 1)
             accessOrder.append(temp)
@@ -57,12 +58,20 @@ class Perceptron:
             # Access the input data using the randomly ordered, unique values of accessOrder, calc sum and adjust weight
             for j in range(numOfSamples):
                 index = accessOrder[j]
-                # The dot product detects if there is a difference and thus a need to update weights,
-                s = np.dot(self.X[index, :], self.weights)
-                self.weights += self.X[index, :] * self.alpha * (self.real_label[index] - np.sign(s))
-                totalError += (self.real_label[index] - np.sign(s)) * (self.real_label[index] - np.sign(s))
+                # The dot product gives the 'net',
+                net = np.dot(self.X[index, :], self.weights)
+
+                # Activation function fires if net > threshold, threshold = -bias
+                threshold = -1 * self.weights[2] + 1
+                if (net > threshold):
+                    out = 1
+                else:
+                    out = 0
+                self.weights += self.X[index, :] * self.alpha * (self.real_label[index] - out)
+                totalError += (self.real_label[index] - out) * (self.real_label[index] - out)
+                # print(f"\nNet is: {net}\nThreshold is: {threshold}\nOut is : {out}\nTotal Error is: {totalError}")
             # This is where we can have a convergence if-statement which returns
-            if totalError < np.power(10.0, 1):
+            if totalError < np.power(10.0, -5):
                 print("Convergence")
                 return
 
@@ -75,17 +84,18 @@ class Perceptron:
             return
 
         # Activation function
-        #y = 1/(1 + np.exp(-1 * self.alpha * (np.dot(self.X[:, [1, 2]], self.weights[1:]) + self.weights[0]))) Soft Threshold
-        y = np.sign(np.dot(self.X, self.weights))
+        # y = 1/(1 + np.exp(-1 * self.alpha * (np.dot(self.X[:, [1, 2]], self.weights[1:]) + self.weights[0]))) Soft Threshold
+        out = np.dot(self.X, self.weights)
+        threshold = -1 * self.weights[2] + 1
 
-        # Adjust label vector to 0 or 1
-        for i in range(y.shape[0]):
-            if y[i] >= 1:
-                y[i] = 1
+        # Activation function
+        for i in range(out.shape[0]):
+            if out[i] > threshold:
+                out[i] = 1
             else:
-                y[i] = 0
+                out[i] = 0
 
-        return y
+        return out
 
     # This method calculates the accuracy of our model using Total Error NEED TO CHANGE TO TOTAL ERROR
     def assess(self, X, y):
@@ -96,12 +106,20 @@ class Perceptron:
     # This method imports the CSV and creates a numpy data structure
     def read_CSV(self, target):
         print("Started CSV")
-        return np.genfromtxt(target, delimiter=",", skip_header=1)
+        return np.genfromtxt(target, delimiter=",", skip_header=2)
 
     # This method displays the results in plot form
     def display(self, y):
-        #col = np.where(self.y[:] == 0, 'k', 'r')
-        plt.scatter(self.X[:, 0], self.X[:, 1], c=y)
+        # Plot points
+        for i in range(y.shape[0]):
+            if i != 0:
+                if y[i] == 0:
+                    plt.scatter(self.X[i, 0], self.X[i, 1], c='b') # Small is Blue
+                else:
+                    plt.scatter(self.X[i, 0], self.X[i, 1], c='g') # Big is Green
+        # Plot line
+        # Plt.Line2D
+        np.savetxt("GroupAResult.csv", self.X, delimiter=',')
         plt.show()
 
 
