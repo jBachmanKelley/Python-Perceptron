@@ -17,7 +17,9 @@ class Perceptron:
         self.real_label = self.data[:, [2]]
 
         # Normalize the data and set a learning rate (alpha)
-        self.X = self.data[:, [0, 1]] / np.linalg.norm(self.data[:, [0, 1]])
+        self.X = self.data[:, [0, 1]]
+        self.X[:, 0] = self.data[:, 0] / np.linalg.norm(self.data[:, 0])
+        self.X[:, 1] = self.data[:, 1] / np.linalg.norm(self.data[:, 1])
         self.alpha = 0.1
 
         # Train the neuron, confirm using real_labels, display
@@ -25,7 +27,7 @@ class Perceptron:
         self.display(self.label())
 
     # This method will train the perceptron: Max iterations are 5000, the error threshold should be passed in(NOT DONE YET)
-    def train(self, max_iterations=1000):
+    def train(self, testPercentage = 0.75, max_iterations=5000):
 
         numOfSamples = self.X.shape[0]
         numOfFeatures = self.X.shape[1]
@@ -36,18 +38,17 @@ class Perceptron:
         # Initialize neuron offset between -0.5 and 0.5 for the 2-D array X
         self.X = np.concatenate([self.X, np.random.rand(numOfSamples, 1) - 0.5], axis=1)
 
-        # NEED TO DO: Implement a way to do a random % of entries
+        # Create a random array of row-numbers for access order
+        accessOrder = []
+        for x in range(numOfSamples):
+            temp = 0
+            while temp in accessOrder:
+                temp = random.randint(0, numOfSamples - 1)
+            accessOrder.append(temp)
+
         for i in range(max_iterations):
             # Initialize T.E to 0
             totalError = 0
-
-            # Create a random array of row-numbers for access order
-            accessOrder = []
-            for x in range(numOfSamples):
-                temp = 0
-                while temp in accessOrder:
-                    temp = random.randint(0, numOfSamples - 1)
-                accessOrder.append(temp)
 
             # Access the input data using the randomly ordered, unique values of accessOrder, calc sum and adjust weight
             for j in range(numOfSamples):
@@ -57,7 +58,7 @@ class Perceptron:
                 self.weights += self.X[index, :] * self.alpha * (self.real_label[index] - np.sign(s))
                 totalError += (self.real_label[index] - np.sign(s)) * (self.real_label[index] - np.sign(s))
             # This is where we can have a convergence if-statement which returns
-            if totalError < np.power(10.0, -5):
+            if totalError < np.power(10.0, 1):
                 print("Convergence")
                 return
 
@@ -85,8 +86,6 @@ class Perceptron:
     # This method calculates the accuracy of our model using Total Error NEED TO CHANGE TO TOTAL ERROR
     def assess(self, X, y):
         pred_y = self.label(X)
-
-        # Check for Episilon value and set max_iterations to 500 if triggered
 
         return np.mean(y == pred_y)
 
