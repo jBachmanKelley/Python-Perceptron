@@ -34,7 +34,7 @@ class Perceptron:
     # This method will train the perceptron: Max iterations are 5000, the error threshold should be passed in(NOT DONE YET)
     def train(self, testPercentage = 0.75, max_iterations=100):
 
-        numOfSamples = self.X.shape[0]
+        numOfSamples = (self.X.shape[0])
         numOfFeatures = self.X.shape[1]
 
         # Add 1 weight for the offset term
@@ -92,8 +92,10 @@ class Perceptron:
         for i in range(out.shape[0]):
             if out[i] > threshold:
                 out[i] = 1
+                self.X[i, 2] = 1
             else:
                 out[i] = 0
+                self.X[i, 2] = 0
 
         return out
 
