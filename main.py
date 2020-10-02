@@ -18,8 +18,7 @@ class Perceptron:
 
         # Normalize the data and set a learning rate (alpha)
         self.X = self.data[:, [0, 1]]
-        self.X[:, 0] = self.data[:, 0] / np.linalg.norm(self.data[:, 0])
-        self.X[:, 1] = self.data[:, 1] / np.linalg.norm(self.data[:, 1])
+        self.X = self.X / np.linalg.norm(self.X)
         self.alpha = 0.1
 
         # Train the neuron, confirm using real_labels, display
