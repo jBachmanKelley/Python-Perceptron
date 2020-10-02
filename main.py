@@ -29,7 +29,7 @@ class Perceptron:
         numOfSamples = self.X.shape[0]
         numOfFeatures = self.X.shape[1]
 
-        # Add 1 term for the offset term
+        # Add 1 weight for the offset term
         self.weights = np.zeros((numOfFeatures + 1))
 
         # Initialize neuron offset between -0.5 and 0.5 for the 2-D array X
@@ -39,8 +39,9 @@ class Perceptron:
         for i in range(max_iterations):
             for j in range(numOfSamples):
                 # The dot product detects if there is a difference and thus a need to update weights,
-                s = np.dot(self.X[j, [1, 2]], self.weights[1:])
-                self.weights += self.X[j, :] * self.alpha * self.weights * (self.real_label[j] - s)
+                s = np.dot(self.X[j, :], self.weights)
+                self.weights += self.X[j, :] * self.alpha * (self.real_label[j] - np.sign(s))
+            # This is where we can have a convergence if-statement
 
         print(self.weights)
 
