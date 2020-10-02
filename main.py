@@ -32,7 +32,7 @@ class Perceptron:
         self.display(self.label())
 
     # This method will train the perceptron: Max iterations are 5000, the error threshold should be passed in(NOT DONE YET)
-    def train(self, testPercentage = 0.75, max_iterations=100):
+    def train(self, max_iterations=100):
 
         numOfSamples = (self.X.shape[0])
         numOfFeatures = self.X.shape[1]
@@ -56,7 +56,7 @@ class Perceptron:
             totalError = 0
 
             # Access the input data using the randomly ordered, unique values of accessOrder, calc sum and adjust weight
-            for j in range(numOfSamples):
+            for j in range(round(numOfSamples * 3.0 / 4.0)):
                 index = accessOrder[j]
                 # The dot product gives the 'net',
                 net = np.dot(self.X[index, :], self.weights)
@@ -108,21 +108,22 @@ class Perceptron:
     # This method imports the CSV and creates a numpy data structure
     def read_CSV(self, target):
         print("Started CSV")
-        return np.genfromtxt(target, delimiter=",", skip_header=2)
+        return np.genfromtxt(target, delimiter=",")
 
     # This method displays the results in plot form
     def display(self, y):
         # Plot points
-        for i in range(y.shape[0]):
-            if i != 0:
-                if y[i] == 0:
-                    plt.scatter(self.X[i, 0], self.X[i, 1], c='b') # Small is Blue
-                else:
-                    plt.scatter(self.X[i, 0], self.X[i, 1], c='g') # Big is Green
+        #for i in range(y.shape[0]):
+        #    if i != 0:
+        #        if y[i] == 0:
+        #            plt.scatter(self.X[i, 0], self.X[i, 1], c='b') # Small is Blue
+        #        else:
+        #            plt.scatter(self.X[i, 0], self.X[i, 1], c='g') # Big is Green
         # Plot line
         # Plt.Line2D
-        np.savetxt("GroupAResult.csv", self.X, delimiter=',')
-        plt.show()
+        np.savetxt("GroupA_75_Result.csv", self.X, delimiter=',')
+        np.savetxt("GroupA_75_Weights.csv", self.weights, delimiter=',')
+        # plt.show()
 
 
 # Main Script
