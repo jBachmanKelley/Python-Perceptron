@@ -11,10 +11,15 @@ class Perceptron:
 
     # This method initializes the instance, loads the CSV, and runs the perceptron
     def __init__(self):
+        # Import the data and separate it into input and real_labels
         self.data = self.read_CSV("GroupA.csv")
-        self.X = self.data[:, [0, 1]]/np.linalg.norm(self.data[:, [0, 1]])
         self.real_label = self.data[:, [2]]
+
+        # Normalize the data and set a learning rate (alpha)
+        self.X = self.data[:, [0, 1]] / np.linalg.norm(self.data[:, [0, 1]])
         self.alpha = 0.01
+
+        # Train the neuron, confirm using real_labels, display
         self.train()
         self.display(self.label())
 
@@ -27,19 +32,15 @@ class Perceptron:
         # Add 1 term for the offset term
         self.weights = np.zeros((numOfFeatures + 1))
 
-        # Initialize random labels between -0.5 and 0.5 for the 2-D array X
-        # self.X = np.concatenate([self.X, np.random.rand(numOfSamples, 1) - 0.5], axis=1)
-        self.X = np.concatenate([self.X, np.ones((numOfSamples, 1)) - 0.5], axis=1)
+        # Initialize neuron offset between -0.5 and 0.5 for the 2-D array X
+        self.X = np.concatenate([self.X, np.random.rand(numOfSamples, 1) - 0.5], axis=1)
 
         # NEED TO DO: Implement a way to do a random % of entries
         for i in range(max_iterations):
             for j in range(numOfSamples):
                 # The dot product detects if there is a difference and thus a need to update weights,
-                s = 1/(1 + np.exp(-1 * self.alpha * (np.dot(self.X[j, [1, 2]], self.weights[1:]) + self.weights[0])))
-                if s > 1:
-                    self.weights += self.X[j, :] * self.alpha * self.weights * (self.y[j] - )
-                else:
-                    self.weights -= self.X[j, :]
+                s = np.dot(self.X[j, [1, 2]], self.weights[1:])
+                self.weights += self.X[j, :] * self.alpha * self.weights * (self.real_label[j] - s)
 
         print(self.weights)
 
@@ -48,11 +49,11 @@ class Perceptron:
         if not hasattr(self, 'weights'):
             print("The data hasn't been trained yet")
             return
-        self.X = self.X[:, [0, 1]]
-        numOfSamples = self.X.shape[0]
 
-        # Initialize random labels between -0.5 and 0.5 for the 2-D array X
-        self.X = np.concatenate([self.X, np.random.rand(numOfSamples, 1) - 0.5], axis=1)
+        # Isolate input
+        self.X = self.X[:, [0, 1]]
+
+        # Activation function
         y = 1/(1 + np.exp(-1 * self.alpha * (np.dot(self.X[:, [1, 2]], self.weights[1:]) + self.weights[0])))
 
         # Adjust label vector to 0 or 1
