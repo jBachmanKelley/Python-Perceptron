@@ -30,7 +30,7 @@ class Perceptron:
             self.X1[x, 0] = (self.X1[x, 0] - np.min(self.X1)) / (np.max(self.X1) - np.min(self.X1))
         self.X = np.concatenate([self.X0, self.X1], axis=1)
 
-        self.alpha = 0.01
+        self.alpha = 0.05
 
         # Train the neuron, confirm using real_labels, display
         self.train()
@@ -66,14 +66,20 @@ class Perceptron:
                 # The dot product gives the 'net',
                 net = np.dot(self.X[index, :], self.weights)
 
+                # HARD
                 # Activation function fires if net > threshold, threshold = -bias
                 threshold = -1 * self.weights[2] + 1
-                if (net > threshold):
-                    out = 1
-                else:
-                    out = 0
-                self.weights += self.X[index, :] * self.alpha * (self.real_label[index] - out)
-                totalError += (self.real_label[index] - out) * (self.real_label[index] - out)
+                # if (net > threshold):
+                #    out = 1
+                # else:
+                #     out = 0
+
+                # SOFT
+                # Activation function fires if out > threshold, threshold = -bias
+                out = self.sigmoid(net, 1, self.weights[2])
+
+                self.weights += self.X[index, :] * self.alpha * (self.real_label[index] - np.tanh(net))
+                totalError += (self.real_label[index] -  np.tanh(net)) * (self.real_label[index] -  np.tanh(net))
                 # print(f"\nNet is: {net}\nThreshold is: {threshold}\nOut is : {out}\nTotal Error is: {totalError}")
             # This is where we can have a convergence if-statement which returns
             if totalError < np.power(10.0, self.epsilon):
@@ -88,27 +94,28 @@ class Perceptron:
             print("The data hasn't been trained yet")
             return
 
-        # Activation function
-        # y = 1/(1 + np.exp(-1 * self.alpha * (np.dot(self.X[:, [1, 2]], self.weights[1:]) + self.weights[0]))) Soft Threshold
-        out = np.dot(self.X, self.weights)
+        net = np.dot(self.X, self.weights)
         threshold = -1 * self.weights[2] + 1
 
-        # Activation function
-        for i in range(out.shape[0]):
-            if out[i] > threshold:
-                out[i] = 1
+        # Hard Activation function
+        # for i in range(net.shape[0]):
+        #    if net[i] > threshold:
+        #        net[i] = 1
+        #        self.X[i, 2] = 1
+        #    else:
+        #        net[i] = 0
+        #        self.X[i, 2] = 0
+
+        # Soft Activation Function
+        for i in range(net.shape[0]):
+            if  np.tanh(net[i]) > 0.5:
+                net[i] = 1
                 self.X[i, 2] = 1
             else:
-                out[i] = 0
+                net[i] = 0
                 self.X[i, 2] = 0
 
-        return out
-
-    # This method calculates the accuracy of our model using Total Error NEED TO CHANGE TO TOTAL ERROR
-    def assess(self, X, y):
-        pred_y = self.label(X)
-
-        return np.mean(y == pred_y)
+        return net
 
     # This method imports the CSV and creates a numpy data structure
     def read_CSV(self, target):
@@ -118,23 +125,26 @@ class Perceptron:
     # This method displays the results in plot form
     def display(self, y):
         # Plot points
-        #for i in range(y.shape[0]):
-        #    if i != 0:
-        #        if y[i] == 0:
-        #            plt.scatter(self.X[i, 0], self.X[i, 1], c='b') # Small is Blue
-        #        else:
-        #            plt.scatter(self.X[i, 0], self.X[i, 1], c='g') # Big is Green
-        # Plot line
-        # Plt.Line2D
-        np.savetxt(f"{self.target}_{self.percentTrain}_Result.csv", self.X, delimiter=',')
-        np.savetxt(f"{self.target}_{self.percentTrain}_Weights.csv", self.weights, delimiter=',')
-        # plt.show()
+        for i in range(y.shape[0]):
+            if i != 0:
+                if y[i] == 0:
+                    plt.scatter(self.X[i, 0], self.X[i, 1], c='b')  # Small is Blue
+                else:
+                    plt.scatter(self.X[i, 0], self.X[i, 1], c='g')  # Big is Green
+
+        # np.savetxt(f"{self.target}_{self.percentTrain}_Result.csv", self.X, delimiter=',')
+        # np.savetxt(f"{self.target}_{self.percentTrain}_Weights.csv", self.weights, delimiter=',')
+        plt.show()
+
+    # This method performs the sigmoid
+    def sigmoid(self, net, k, b):
+        return 1 / (1 + np.exp(-(k * net + b)))
 
 
 # Main Script
-perc1 = Perceptron("GroupA", 0.75, -5)
-perc2 = Perceptron("GroupA", 0.25, -5)
-perc3 = Perceptron("GroupB", 0.75, 2)
-perc4 = Perceptron("GroupB", 0.25, 2)
-perc5 = Perceptron("GroupC", 0.75, 2)
-perc6 = Perceptron("GroupC", 0.25, 2)
+perc1 = Perceptron("TestCSV", 0.75, -5)
+# perc2 = Perceptron("GroupA", 0.25, -5)
+# perc3 = Perceptron("GroupB", 0.75, 2)
+# perc4 = Perceptron("GroupB", 0.25, 2)
+# perc5 = Perceptron("GroupC", 0.75, 2)
+# perc6 = Perceptron("GroupC", 0.25, 2)
