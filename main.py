@@ -30,14 +30,14 @@ class Perceptron:
             self.X1[x, 0] = (self.X1[x, 0] - np.min(self.X1)) / (np.max(self.X1) - np.min(self.X1))
         self.X = np.concatenate([self.X0, self.X1], axis=1)
 
-        self.alpha = 0.05
+        self.alpha = 0.02
 
         # Train the neuron, confirm using real_labels, display
         self.train()
         self.display(self.label())
 
     # This method will train the perceptron: Max iterations are 5000, the error threshold should be passed in(NOT DONE YET)
-    def train(self, max_iterations=500):
+    def train(self, max_iterations=5000):
 
         numOfSamples = self.X.shape[0]
         numOfFeatures = self.X.shape[1]
@@ -68,18 +68,18 @@ class Perceptron:
 
                 # HARD
                 # Activation function fires if net > threshold, threshold = -bias
-                # threshold = -1 * self.weights[2] + 1
-                # if (net > threshold):
-                #    out = 1
-                # else:
-                #     out = 0
+                threshold = -1 * self.weights[2] + 1
+                if (net > threshold):
+                    out = 1
+                else:
+                    out = 0
 
                 # SOFT
                 # Activation function fires if out > 0.5
-                out = self.sigmoid(net, 1, 0)
+                # out = self.sigmoid(net, 1, 0)
 
-                self.weights += self.X[index, :] * self.alpha * (self.real_label[index] - np.tanh(out))
-                totalError += (self.real_label[index] -  np.tanh(out)) * (self.real_label[index] -  np.tanh(out))
+                self.weights += self.X[index, :] * self.alpha * (self.real_label[index] - out)
+                totalError += (self.real_label[index] -  out) * (self.real_label[index] -  out)
                 # print(f"\nNet is: {net}\nThreshold is: {threshold}\nOut is : {out}\nTotal Error is: {totalError}")
             # This is where we can have a convergence if-statement which returns
             if totalError < np.power(10.0, self.epsilon):
@@ -95,25 +95,25 @@ class Perceptron:
             return
 
         net = np.dot(self.X, self.weights)
-        # threshold = -1 * self.weights[2] + 1
+        threshold = -1 * self.weights[2] + 1
 
         # Hard Activation function
-        # for i in range(net.shape[0]):
-        #    if net[i] > threshold:
-        #        net[i] = 1
-        #        self.X[i, 2] = 1
-        #    else:
-        #        net[i] = 0
-        #        self.X[i, 2] = 0
-
-        # Soft Activation Function
         for i in range(net.shape[0]):
-            if  self.sigmoid(net[i], 1, 0) > 0.5:
+            if net[i] > threshold:
                 net[i] = 1
                 self.X[i, 2] = 1
             else:
                 net[i] = 0
                 self.X[i, 2] = 0
+
+        # Soft Activation Function
+        # for i in range(net.shape[0]):
+        #    if  self.sigmoid(net[i], 1, 0) > 0.5:
+        #        net[i] = 1
+        #        self.X[i, 2] = 1
+        #    else:
+        #        net[i] = 0
+        #        self.X[i, 2] = 0
 
         return net
 
@@ -132,8 +132,9 @@ class Perceptron:
                 else:
                     plt.scatter(self.X[i, 0], self.X[i, 1], c='g')  # Big is Green
 
-        np.savetxt(f"{self.target}_{self.percentTrain}_Result_Soft.csv", self.X, delimiter=',')
-        np.savetxt(f"{self.target}_{self.percentTrain}_Weights_Soft.csv", self.weights, delimiter=',')
+
+        #np.savetxt(f"{self.target}_{self.percentTrain}_Result_Soft.csv", self.X, delimiter=',')
+        #np.savetxt(f"{self.target}_{self.percentTrain}_Weights_Soft.csv", self.weights, delimiter=',')
         plt.show()
 
     # This method performs the sigmoid
@@ -142,9 +143,9 @@ class Perceptron:
 
 
 # Main Script
-# perc1 = Perceptron("GroupA", 0.75, -5)
-# perc2 = Perceptron("GroupA", 0.25, -5)
-# perc3 = Perceptron("GroupB", 0.75, 2)
-# perc4 = Perceptron("GroupB", 0.25, 2)
-# perc5 = Perceptron("GroupC", 0.75, 2)
-# perc6 = Perceptron("GroupC", 0.25, 2)
+perc1 = Perceptron("GroupA", 0.75, -5)
+perc2 = Perceptron("GroupA", 0.25, -5)
+perc3 = Perceptron("GroupB", 0.75, 2)
+perc4 = Perceptron("GroupB", 0.25, 2)
+perc5 = Perceptron("GroupC", 0.75, 2)
+perc6 = Perceptron("GroupC", 0.25, 2)
