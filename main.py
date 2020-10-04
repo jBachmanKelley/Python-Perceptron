@@ -37,9 +37,9 @@ class Perceptron:
         self.display(self.label())
 
     # This method will train the perceptron: Max iterations are 5000, the error threshold should be passed in(NOT DONE YET)
-    def train(self, max_iterations=5000):
+    def train(self, max_iterations=500):
 
-        numOfSamples = (self.X.shape[0])
+        numOfSamples = self.X.shape[0]
         numOfFeatures = self.X.shape[1]
 
         # Add 1 weight for the offset term
@@ -68,18 +68,18 @@ class Perceptron:
 
                 # HARD
                 # Activation function fires if net > threshold, threshold = -bias
-                threshold = -1 * self.weights[2] + 1
+                # threshold = -1 * self.weights[2] + 1
                 # if (net > threshold):
                 #    out = 1
                 # else:
                 #     out = 0
 
                 # SOFT
-                # Activation function fires if out > threshold, threshold = -bias
-                out = self.sigmoid(net, 1, self.weights[2])
+                # Activation function fires if out > 0.5
+                out = self.sigmoid(net, 1, 0)
 
-                self.weights += self.X[index, :] * self.alpha * (self.real_label[index] - np.tanh(net))
-                totalError += (self.real_label[index] -  np.tanh(net)) * (self.real_label[index] -  np.tanh(net))
+                self.weights += self.X[index, :] * self.alpha * (self.real_label[index] - np.tanh(out))
+                totalError += (self.real_label[index] -  np.tanh(out)) * (self.real_label[index] -  np.tanh(out))
                 # print(f"\nNet is: {net}\nThreshold is: {threshold}\nOut is : {out}\nTotal Error is: {totalError}")
             # This is where we can have a convergence if-statement which returns
             if totalError < np.power(10.0, self.epsilon):
@@ -95,7 +95,7 @@ class Perceptron:
             return
 
         net = np.dot(self.X, self.weights)
-        threshold = -1 * self.weights[2] + 1
+        # threshold = -1 * self.weights[2] + 1
 
         # Hard Activation function
         # for i in range(net.shape[0]):
@@ -108,7 +108,7 @@ class Perceptron:
 
         # Soft Activation Function
         for i in range(net.shape[0]):
-            if  np.tanh(net[i]) > 0.5:
+            if  self.sigmoid(net[i], 1, 0) > 0.5:
                 net[i] = 1
                 self.X[i, 2] = 1
             else:
@@ -132,8 +132,8 @@ class Perceptron:
                 else:
                     plt.scatter(self.X[i, 0], self.X[i, 1], c='g')  # Big is Green
 
-        # np.savetxt(f"{self.target}_{self.percentTrain}_Result.csv", self.X, delimiter=',')
-        # np.savetxt(f"{self.target}_{self.percentTrain}_Weights.csv", self.weights, delimiter=',')
+        np.savetxt(f"{self.target}_{self.percentTrain}_Result_Soft.csv", self.X, delimiter=',')
+        np.savetxt(f"{self.target}_{self.percentTrain}_Weights_Soft.csv", self.weights, delimiter=',')
         plt.show()
 
     # This method performs the sigmoid
@@ -142,7 +142,7 @@ class Perceptron:
 
 
 # Main Script
-perc1 = Perceptron("TestCSV", 0.75, -5)
+# perc1 = Perceptron("GroupA", 0.75, -5)
 # perc2 = Perceptron("GroupA", 0.25, -5)
 # perc3 = Perceptron("GroupB", 0.75, 2)
 # perc4 = Perceptron("GroupB", 0.25, 2)
